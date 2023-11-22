@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "djangotodo"
+version = "0.1.0"
+description = "ToDo App that helps you to do the add, update, delete & read the todos"
+authors = ["ashwinPy <ashwinam31@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^4.2.7"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block doc_title %}ToDo | Homepage{% endblock doc_title %}
+
+{% block style %}
+  .custom_btn_class{
+    border: none;
+    background-color: white;
+  }
+{% endblock style %}
+
+{% block content %}
+
+<div class="mx-3 mt-5">
+    <div class="row align-items-start">
+      <div class="col-3">
+        <div class="card shadow p-3 mb-5 bg-body rounded-3">
+            <div class="card-header">
+                Add ToDo
+               </div>
+               <form action="{% url 'todos' %}" method="post">
+                {% csrf_token %}
+                {% if action == 'edit_todo' %}
+                  <input type="hidden" name="action" value="{{action}}">
+                  <input type="hidden" name="todo_id" value="{{todo_id}}">
+                {% else %}
+                  <input type="hidden" name="action" value="create_todo">
+                {% endif %}
+                <div class="card-body">
+                  {% comment %} Alert Message {% endcomment %}
+                  {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" role="alert" id="myAlert">
+                      {{ message }}
+                    </div>
+                    {% endfor %}
+                  {% endif %}
+                  {% comment %} End alert message {% endcomment %}
+                  <div class="mb-3">
+                    <label for="todo_name_id" class="form-label">ToDo Name</label>
+                    {{ form.todo_name }}
+                  </div>
+                  <div class="mb-3">
+                    <label for="todo_description_id" class="form-label">ToDo Description</label>
+                    {{ form.todo_description }}              
+                  </div>
+                  <div class="col-12">
+                    <button class="btn btn-primary" type="submit">{% if action == 'edit_todo' %} Update {% else %} Submit {% endif %}</button>
+                  </div>
+                </div>
+          </form>
+
+          </div>
+
+      </div>
+      <div class="col">
+        <div class="card shadow p-3 mb-5 bg-body rounded-3">
+            <div class="card-header d-flex flex-row">
+                <h3>ToDo Nation</h3>
+                <div class="d-flex" style="margin-left: auto;">
+                <form class="d-flex" role="search">
+                  <input class="form-control me-2" type="search" placeholder="Search By ToDo Name ..." aria-label="Search" name="search_todo" value="{{search_inp}}">
+                  <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+              </div>
+               </div>
+            <div class="card-body">
+                
+                <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">ToDo Name</th>
+                        <th scope="col">Todo Description</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for object in objects %}
+                      <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td>{{ object.todo_name }}</td>
+                        <td>{{ object.todo_description }}</td>
+                        <td>{{ object.status }}</td>
+                        <td>
+                          <div class="d-flex">
+                          <div class="px-1">
+                          <form action="{% url 'todos' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="fetch_todo">
+                            <input type="hidden" name="todo_id" value="{{ object.todo_id }}">
+                            <button type="submit" class="px-1 cursor-pointer custom_btn_class">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                          </form>
+                        </div>
+                          <div class="">
+                          <form action="{% url 'todos' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete_todo">
+                            <input type="hidden" name="todo_id" value="{{ object.todo_id }}">
+                              <button type="submit" class="px-1 cursor-pointer custom_btn_class">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                        </div>
+                      </div>
+                        </td>
+                      </tr>
+                      {% empty %}
+                      <tr>
+                        <td><h3>No Data is available.</h3></td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                  
+                  <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-end">
+                      <!-- <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                      </li> -->
+                      {% for pge_num in objects.paginator.page_range %}
+                        <li class="page-item {% if current_page == pge_num %} active {% endif %}" ><a class="page-link" href="{% url 'todos' %}?page={{ pge_num }}{% if search_inp %}&search_todo={{search_inp}}{% endif %}">{{pge_num}}</a></li>
+                      {% endfor %}
+                      <!-- <li class="page-item">
+                        <a class="page-link" href="#">Next</a>
+                      </li> -->
+                    </ul>
+                  </nav>
+            </div>
+          </div>
+      </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block jsscript %}
+<script>
+
+  function removeAlert() {
+    var alert = document.getElementById('myAlert');
+    
+    if (alert) {
+      setTimeout(function() {
+        alert.style.display = 'none';
+      }, 5000); // 5000 milliseconds = 5 seconds
+    }
+  }
+  
+  // Call the function to remove the alert
+  removeAlert();
+</script>
+
+{% endblock jsscript %}
