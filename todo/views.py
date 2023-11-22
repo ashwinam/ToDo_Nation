@@ -109,6 +109,6 @@ class ToDoView(LoginRequiredMixin, ListView):
         paginate = Paginator(queryset, self.__COUNTS)
         return paginate.get_page(page_number)
     
-    def get_queryset(self, search_query='') -> QuerySet[Any]:
+    def get_queryset(self, search_query=''):
         objects = self.model.objects.filter(add_by=self.request.user, todo_name__icontains=search_query).order_by('todo_name')
         return objects
