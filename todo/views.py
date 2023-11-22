@@ -1,4 +1,3 @@
-from typing import Any
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
@@ -21,7 +20,7 @@ class ToDoView(LoginRequiredMixin, ListView):
     form_class = ToDoForm
     __COUNTS = 3
 
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+    def get_context_data(self, **kwargs):
         try:
             kwargs['form'] = ToDoForm()
             objects = self.model.objects.filter(add_by=self.request.user.id)
