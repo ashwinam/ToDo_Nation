@@ -69,6 +69,7 @@
                 <table class="table">
                     <thead>
                       <tr>
+                        <th></th>
                         <th scope="col">#</th>
                         <th scope="col">ToDo Name</th>
                         <th scope="col">Todo Description</th>
@@ -78,7 +79,12 @@
                     </thead>
                     <tbody>
                       {% for object in objects %}
-                      <tr>
+                      <tr class="{% if object.status == 'Complete' %}text-secondary{% endif %}">
+                        <td>
+                          <div class="form-check">
+                            <input class="form-check-input toggle_status" type="checkbox" value="" id="" data-todo_id="{{object.todo_id}}" {% if object.status == 'Complete' %} checked {% endif %}>
+                          </div>
+                        </td>
                         <th scope="row">{{ forloop.counter }}</th>
                         <td>{{ object.todo_name }}</td>
                         <td>{{ object.todo_description }}</td>
@@ -151,6 +157,46 @@
   
   // Call the function to remove the alert
   removeAlert();
+
+const checkboxes = document.querySelectorAll('.toggle_status');
+
+// Add a change event listener to each checkbox
+checkboxes.forEach(checkbox => {
+  checkbox.addEventListener('change', function() {
+
+    checkboxes.forEach(cb => {
+      cb.disabled = true;
+    });
+
+    $.ajax({
+      headers: {'X-CSRFToken': '{{ csrf_token }}'},                                                
+      url: "{% url 'todos' %}",
+      data: {'action': 'change_status', 'id': this.dataset.todo_id},
+      method: 'POST',
+      success: function(data) {
+
+        checkboxes.forEach(cb => {
+          cb.disabled = false;
+        });
+
+        if (data.code === 'success'){
+          window.location.reload()
+        } else if(data.code === 'error'){
+          if(!alert(data.message)){
+            window.location.href = '/todo/'
+          }
+        }
+      },
+      error: function(data){
+        checkboxes.forEach(cb => {
+          cb.disabled = false;
+        });
+      }
+    })
+
+  });
+});
+
 </script>
 
 {% endblock jsscript %}
